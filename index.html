@@ -2,16 +2,20 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>ESTÚDIO INFINITO v2.2</title>
+    <title>ESTÚDIO INFINITO - Profissional</title>
     <style>
-        body { background: #121212; color: #fff; font-family: sans-serif; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: #1a1a1a; padding: 25px; border-radius: 12px; border: 1px solid #333; }
+        body { background: #121212; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #1a1a1a; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         h1 { text-align: center; color: #ffab40; margin-bottom: 20px; }
         .input-group { margin-bottom: 15px; }
-        label { display: block; color: #aaa; margin-bottom: 5px; text-transform: uppercase; font-size: 13px; }
-        input, select { width: 100%; padding: 12px; background: #252525; border: 1px solid #444; color: #fff; border-radius: 6px; }
-        button { background: #ffab40; color: #000; padding: 15px; border: none; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 6px; font-size: 16px; }
-        .canvas-area { border: 2px dashed #444; min-height: 400px; margin-top: 20px; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+        label { display: block; color: #aaa; margin-bottom: 5px; text-transform: uppercase; font-size: 12px; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; background: #252525; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
+        .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 15px; font-weight: bold; cursor: pointer; border: none; border-radius: 4px; transition: 0.3s; }
+        .btn-gen { background: #ffab40; color: #000; }
+        .btn-down { background: #4caf50; color: #fff; }
+        .btn-print { background: #2196f3; color: #fff; }
+        #previewArea { margin-top: 20px; border: 2px dashed #444; padding: 10px; text-align: center; min-height: 200px; }
         #outputImage { max-width: 100%; display: none; border-radius: 4px; }
     </style>
 </head>
@@ -21,138 +25,102 @@
     <h1>ESTÚDIO INFINITO</h1>
     
     <div class="input-group">
-        <label>ORDEM / TEMA CENTRAL:</label>
-        <input type="text" id="userPrompt" placeholder="Ex: Estampa floral para móveis...">
+        <label>Tema da Estampa:</label>
+        <input type="text" id="userPrompt" placeholder="Descreva o design desejado...">
     </div>
 
     <div class="input-group">
-        <label>SEGMENTO DE PRODUÇÃO:</label>
+        <label>Segmento de Superfície:</label>
         <select id="segmento">
             <option>Papelaria Personalizada</option>
-            <option>Papelaria de Luxo</option>
+            <option>Papelaria Personalizada de Luxo</option>
             <option>Scrapbook</option>
+            <option>Papel Digital Impresso</option>
+            <option>Tecidos</option>
+            <option>Roupas / Vestuário</option>
+            <option>Cama, Mesa e Banho</option>
+            <option>Almofadas</option>
+            <option>Cortinas</option>
+            <option>Papel de Parede</option>
             <option>Móveis</option>
+            <option>Vidro</option>
+            <option>Cerâmica</option>
+            <option>Madeira</option>
+            <option>Azulejo</option>
+            <option>Plástico (várias categorias)</option>
+            <option>Estampas para todas as superfícies</option>
         </select>
     </div>
 
-    <div class="input-group">
-        <label>GALERIA DE ESTILOS:</label>
-        <select id="estilo">
-            <option>Minimalista</option>
-            <option>Barroco</option>
-            <option>Aquarela</option>
-        </select>
+    <div style="display: flex; gap: 10px;">
+        <div class="input-group" style="flex: 1;">
+            <label>Tamanho:</label>
+            <select id="tamanho">
+                <option>1024x1024 (Padrão)</option>
+                <option>A4 (Alta Definição)</option>
+                <option>A3 (Alta Definição)</option>
+            </select>
+        </div>
+        <div class="input-group" style="flex: 1;">
+            <label>Formato:</label>
+            <select id="formato">
+                <option value="png">PNG</option>
+                <option value="jpg">JPG</option>
+                <option value="pdf">PDF</option>
+            </select>
+        </div>
     </div>
 
-    <button onclick="gerarDesignIA()">GERAR DESIGN CALIBRADO COM IA</button>
+    <div class="btn-row">
+        <button class="btn-gen" onclick="gerarDesignIA()">GERAR DESIGN</button>
+        <button class="btn-down" onclick="baixarArquivo()">BAIXAR</button>
+        <button class="btn-print" onclick="imprimirArquivo()">IMPRIMIR</button>
+    </div>
 
-    <div class="canvas-area">
-        <img id="outputImage" alt="Preview da Estampa">
+    <div id="previewArea">
+        <p style="color: #666;">Visor Preview</p>
+        <img id="outputImage" src="" alt="Resultado">
     </div>
 </div>
 
 <script>
-    // 
-   // 
-const  <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>ESTÚDIO INFINITO</title>
-</head>
-<body>
-
-    <input type="text" id="userPrompt" placeholder="Tema da estampa...">
-    <select id="segmento"><option>Papelaria</option><option>Móveis</option></select>
-    <select id="estilo"><option>Minimalista</option><option>Aquarela</option></select>
+async function gerarDesignIA() {
+    const prompt = document.getElementById('userPrompt').value;
+    const segmento = document.getElementById('segmento').value;
+    const imgElement = document.getElementById('outputImage');
     
-    <button onclick="gerarDesignIA()">GERAR DESIGN CALIBRADO</button>
+    if(!prompt) return alert("Descreva o tema da estampa!");
+    alert('Gerando design para ' + segmento + '...');
     
-    <div id="canvas-area">
-        <img id="outputImage" style="display:none; max-width:100%;">
-    </div>
-
-<script>
-    async function gerarDesignIA() {
-        // O navegador vai pedir a chave aqui. Você cola a chave apenas na caixinha que aparecerá.
-        const API_KEY = prompt("Cole sua chave da OpenAI aqui:");
-        
-        if(!API_KEY) return alert("Chave necessária para gerar o design.");
-
-        const promptText = document.getElementById('userPrompt').value;
-        const segmento = document.getElementById('segmento').value;
-        const estilo = document.getElementById('estilo').value;
-        const img = document.getElementById('outputImage');
-        
-        alert('Processando estampa...');
-
-        try {
-            const response = await fetch('https://api.openai.com/v1/images/generations', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Authorization': `Bearer ${API_KEY}` 
-                },
-                body: JSON.stringify({
-                    model: "dall-e-3",
-                    prompt: `Estampa seamless para ${segmento}, estilo ${estilo}. Tema: ${promptText}.`,
-                    n: 1,
-                    size: "1024x1024"
-                })
-            });
-            const data = await response.json();
-            
-            if(data.data) {
-                img.src = data.data[0].url;
-                img.style.display = 'block';
-            } else {
-                alert('Erro: Verifique se sua chave está correta.');
-            }
-        } catch(e) { 
-            alert('Erro de conexão.'); 
+    try {
+        const response = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer SUA_CHAVE_AQUI' },
+            body: JSON.stringify({ model: "dall-e-3", prompt: `Estampa profissional seamless para ${segmento}. Tema: ${prompt}.`, n: 1, size: "1024x1024" })
+        });
+        const data = await response.json();
+        if (data.data) {
+            imgElement.src = data.data[0].url;
+            imgElement.style.display = 'block';
         }
-    }
-</script>
-</body>
-</html>
+    } catch (e) { alert('Erro na conexão.'); }
+}
 
-    async function gerarDesignIA() {
-        const prompt = document.getElementById('userPrompt').value;
-        const segmento = document.getElementById('segmento').value;
-        const estilo = document.getElementById('estilo').value;
-        const imgElement = document.getElementById('outputImage');
-        
-        if(!prompt) return alert("Por favor, descreva a estampa!");
-        
-        alert('Processando estampa para: ' + segmento + '...');
+function baixarArquivo() {
+    const img = document.getElementById('outputImage');
+    if (!img.src) return;
+    const a = document.createElement('a');
+    a.href = img.src;
+    a.download = 'Estudio_Infinito.' + document.getElementById('formato').value;
+    a.click();
+}
 
-        try {
-            const response = await fetch('https://api.openai.com/v1/images/generations', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Authorization': `Bearer ${API_KEY}` 
-                },
-                body: JSON.stringify({
-                    model: "dall-e-3",
-                    prompt: `Estampa seamless para ${segmento}, estilo ${estilo}. Tema: ${prompt}. Alta definição, profissional.`,
-                    n: 1, 
-                    size: "1024x1024"
-                })
-            });
-            
-            const data = await response.json();
-            
-            if(data.data && data.data[0].url) {
-                imgElement.src = data.data[0].url;
-                imgElement.style.display = 'block';
-            } else {
-                alert('Erro ao gerar: Verifique sua chave API e saldo na OpenAI.');
-            }
-        } catch (e) { 
-            alert('Erro no Motor. Verifique sua conexão.'); 
-        }
-    }
+function imprimirArquivo() {
+    const img = document.getElementById('outputImage');
+    if (!img.src) return;
+    const win = window.open();
+    win.document.write('<img src="' + img.src + '" onload="window.print();window.close()">');
+}
 </script>
 </body>
 </html>
